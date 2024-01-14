@@ -4,18 +4,18 @@ import type { College } from "../+server";
 import extraCollegeData from "$lib/data/colleges.json";
 
 function chanceMe(college: College, satReading: number, satMath: number, weightedGPA: number) {
-    const satReadingPercentile = (satReading - college["SAT Critical Reading 25th Percentile"]) /
-        (college["SAT Critical Reading 75th Percentile"] - college["SAT Critical Reading 25th Percentile"]);
+    // TODO: better chancer
+    const r25 = college["SAT Critical Reading 25th Percentile"];
+    const r75 = college["SAT Critical Reading 75th Percentile"];
+    const ra = (r25 + r75) / 2;
+    const m25 = college["SAT Math 25th Percentile"];
+    const m75 = college["SAT Math 75th Percentile"];
+    const ma = (m25 + m75) / 2;
+    const avgScore = (ra + ma) / 2;
+    
+    const score = satReading + satMath;
 
-    const satMathPercentile = (satMath - college["SAT Math 25th Percentile"]) /
-        (college["SAT Math 75th Percentile"] - college["SAT Math 25th Percentile"]);
-
-    const gpaPercentile = weightedGPA / 4;
-
-    // Calculate overall admission chance based on percentiles
-    const admissionChance = (satReadingPercentile + satMathPercentile + gpaPercentile) / 3;
-
-    return admissionChance;
+    return Math.min(99, Math.floor((score / avgScore) * 100 * (college["Admissions Total"] / college["Applicants Total"])));
 }
 
 async function getCollege(dataUsaId: string) {
@@ -44,12 +44,17 @@ export const GET: RequestHandler = async (req) => {
 
 export const POST: RequestHandler = async (req) => {
     const c: College = await getCollege(req.params.id);
-    const body = await req.request.json();
-    const rw = parseInt(body['rw']) || 200;
-    const math = parseInt(body['math']) || 200;
-    const weightedGPA = parseFloat(body['gpa']) || 2.0;
+    const rw = parseInt(req.url.searchParams.get('rw') || '200') ;
+    const math = parseInt(req.url.searchParams.get('math') ||'200') ;
+    const weightedGPA = parseFloat(req.url.searchParams.get('gpa') ||'2.0');
 
-    return json({
+    console.log(rw, math, weightedGPA);
+
+    let out = {
         'chance': chanceMe(c, rw, math, weightedGPA)
-    });
+    };
+
+    console.log(out);
+
+    return json(out);
 }

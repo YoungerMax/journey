@@ -25,6 +25,14 @@
         return await (await fetch('/api/college/' + r['id'])).json();
     }
 
+    async function admissionChance(id: string) {
+        return (await (await fetch('/api/college/' + id + '?' + new URLSearchParams({
+            'rw': satReading.toString(),
+            'm': satMath.toString(),
+            'gpa': weightedGPA.toString()
+        }), { method: 'POST' })).json())['chance'];
+    }
+
     function saveStudent() {
         localStorage.setItem('satmath', satMath.toString());
         localStorage.setItem('satreading', satReading.toString());
@@ -69,6 +77,15 @@
         <p><strong>Salary after school</strong>: {school['salary_after_school']}</p>
         <p><strong>Acceptance Rate</strong>: {Math.floor(school['Admissions Total'] / school['Applicants Total'] * 100)}% ({school['Admissions Total']} / {school['Applicants Total']})</p>
         <p><strong>Tuition</strong>: ${school['State Tuition']}</p>
+
+        <br />
+        <h2>Estimated admission chance</h2>
+        {#await admissionChance(school['ID University'])}
+            <Skeleton />
+        {:then chance} 
+            <p><strong>Chance</strong>: {chance}%</p>
+        {/await}
+        
         <br />
         <a href={school.url} target="_blank">Visit their website</a>
         <br />

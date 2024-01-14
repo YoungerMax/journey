@@ -46,4 +46,5 @@ export type College = {
     "url": string;
     "students": number;
     "salary_after_school": number;
+    "sat_avg": number | null;
 };
