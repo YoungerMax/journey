@@ -166,7 +166,7 @@
                     <div class="entry">
                         <div style="padding: 16px;">
                             <h3>{quote.name} ({quote.symbol})</h3>
-                            <p>Price: {fixDecimal(quote.price)} {quote.currency} ({quote.percentChange}%)</p>
+                            <p>Price: {fixDecimal(quote.price)} {quote.currency ? quote.currency : ""} ({quote.percentChange}%)</p>
                         </div>
     
                         <!-- <button on:click={ () => modalTickerSymbol = quote.symbol }>More</button> -->

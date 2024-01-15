@@ -87,7 +87,7 @@
         {/await}
         
         <br />
-        <a href={school.url} target="_blank">Visit their website</a>
+        <a href={`https://${school.url}`} target="_blank">Visit their website</a>
         <br />
         <p>As of {school['ID Year']}, data via College Scorecard & DataUSA</p>
     {/await}
